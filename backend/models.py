@@ -6,7 +6,7 @@ from django.db import models
 class CustomerUser(AbstractUser):
   phone_number = models.CharField(max_length=15, blank=True, null=True)
   means_of_id = models.FileField(blank=True)
-  avartar = models.ImageField(blank=True)
+  avartar = models.ImageField(upload_to='avatars/', blank=True)
 
 
   def __str__(self):
