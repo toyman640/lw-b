@@ -1,10 +1,14 @@
-from rest_framework import status
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import update_last_login
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 from rest_framework import generics, permissions
 from rest_framework.exceptions import PermissionDenied
 from .models import CustomerUser
 from .serializers import CustomerUserSerializer
+from rest_framework.authtoken.models import Token
 
 class CustomerUserListView(generics.ListAPIView):
   queryset = CustomerUser.objects.all()
@@ -32,3 +36,24 @@ class CustomerUserDetailView(generics.RetrieveUpdateDestroyAPIView):
     if 'is_active' in request.data and not request.user.is_superuser:
       raise PermissionDenied("Only superusers can change the 'is_active' status.")
     return super().update(request, *args, **kwargs)
+
+
+class LoginView(APIView):
+  permission_classes = [AllowAny]
+
+  def post(self, request, *args, **kwargs):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    user = authenticate(request, username=username, password=password)
+
+    if user is not None:
+      login(request, user)
+      update_last_login(None, user)
+      return Response({'detail': 'Login successful'}, status=status.HTTP_200_OK)
+    else:
+      return Response({'detail': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+
+class LogoutView(APIView):
+  def post(self, request, *args, **kwargs):
+    logout(request)
+    return Response({'detail': 'Logout successful'}, status=status.HTTP_200_OK)
