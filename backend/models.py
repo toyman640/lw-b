@@ -13,3 +13,18 @@ class CustomerUser(AbstractUser):
 
   def __str__(self):
     return self.username
+
+class Category(models.Model):
+  BUILDING = 'building'
+  LAND = 'land'
+  APARTMENT = 'apartment'
+
+  CATEGORY_CHOICES = [
+    (BUILDING, 'Building'),
+    (LAND, 'Land'),
+    (APARTMENT, 'Apartment'),
+  ]
+
+  name = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+  def __str__(self):
+    return self.name
