@@ -3,9 +3,10 @@ from django.contrib.auth.models import update_last_login
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import generics, permissions
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.decorators import api_view, permission_classes
 from .models import CustomerUser
 from .serializers import CustomerUserSerializer
 from rest_framework.authtoken.models import Token
@@ -58,3 +59,11 @@ class LogoutView(APIView):
   def post(self, request, *args, **kwargs):
     logout(request)
     return Response({'detail': 'Logout successful'}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def current_user_view(request):
+  user = request.user
+  serializer = CustomerUserSerializer(user)
+  return Response(serializer.data)
