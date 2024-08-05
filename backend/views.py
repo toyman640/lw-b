@@ -7,8 +7,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import generics, permissions
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import api_view, permission_classes
-from .models import CustomerUser
-from .serializers import CustomerUserSerializer
+from .models import CustomerUser, Category
+from .serializers import CustomerUserSerializer, CategorySerializer
 from rest_framework.authtoken.models import Token
 
 class CustomerUserListView(generics.ListAPIView):
@@ -67,3 +67,13 @@ def current_user_view(request):
   user = request.user
   serializer = CustomerUserSerializer(user)
   return Response(serializer.data)
+
+class CategoryListView(generics.ListAPIView):
+  queryset = Category.objects.all()
+  serializer_class = CategorySerializer
+  permission_classes = [permissions.IsAuthenticated]
+
+class CategoryCreateView(generics.CreateAPIView):
+  queryset = Category.objects.all()
+  serializer_class = CategorySerializer
+  permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
